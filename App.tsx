@@ -1,113 +1,106 @@
+// Copie e cole este conteúdo TODO no seu arquivo App.tsx
+
 import React, { useState, useEffect } from 'react';
-import useLocalStorage from './hooks/useLocalStorage';
-import { User, Screen } from './types';
 import LoginScreen from './components/LoginScreen';
 import GuidesScreen from './components/GuidesScreen';
 import DiaryScreen from './components/DiaryScreen';
 import TasksScreen from './components/TasksScreen';
 import CommunityScreen from './components/CommunityScreen';
-import RilaneScreen from './components/RilaneScreen';
-import BottomNav from './components/BottomNav';
 import PdfViewer from './components/PdfViewer';
-import { DownloadIcon } from './components/icons';
+import BottomNav from './components/BottomNav';
+import RilaneScreen from './components/RilaneScreen';
+import { useLocalStorage } from './hooks/useLocalStorage';
+
+// Define as chaves de LocalStorage
+const USER_KEY = 'menteCalmaUser';
+const FIRST_LOGIN_KEY = 'menteCalmaFirstLogin';
+const UNLOCKED_PACKS_KEY = 'menteCalmaUnlockedPacks'; // <-- NOSSA NOVA CHAVE
+
+type Screen = 'login' | 'guides' | 'diary' | 'tasks' | 'community' | 'rilane';
 
 const App: React.FC = () => {
-    const [user, setUser] = useLocalStorage<User | null>('menteCalmaUser', null);
-    const [firstLogin, setFirstLogin] = useLocalStorage<string | null>('menteCalmaFirstLogin', null);
-    const [activeScreen, setActiveScreen] = useState<Screen>('guides');
-    const [pdfViewerState, setPdfViewerState] = useState<{ visible: boolean; url: string; title: string }>({
-        visible: false,
-        url: '',
-        title: '',
-    });
-    const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [user, setUser] = useLocalStorage<any>(USER_KEY, null);
+  const [firstLogin, setFirstLogin] = useLocalStorage<string | null>(FIRST_LOGIN_KEY, null);
+  
+  // Estado para os pacotes desbloqueados
+  const [unlockedPacks, setUnlockedPacks] = useLocalStorage<string[]>(UNLOCKED_PACKS_KEY, []);
+  
+  const [currentScreen, setCurrentScreen] = useState<Screen>('guides');
+  const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null);
+  const [pdfViewerTitle, setPdfViewerTitle] = useState<string>('');
 
-    useEffect(() => {
-        const handleBeforeInstallPrompt = (e: Event) => {
-          e.preventDefault();
-          setInstallPrompt(e);
-        };
+  // --- LÓGICA DE DESBLOQUEIO POR URL ---
+  // Este código corre *uma vez* quando o app carrega
+  useEffect(() => {
+    // 1. Pega os parâmetros da URL (ex: ?pacote=completo)
+    const params = new URLSearchParams(window.location.search);
+    const purchasedPack = params.get('pacote'); // 'pacote' é a chave que vamos usar
 
-        const handleAppInstalled = () => {
-          setInstallPrompt(null);
-        };
-
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        window.addEventListener('appinstalled', handleAppInstalled);
-
-        return () => {
-          window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-          window.removeEventListener('appinstalled', handleAppInstalled);
-        };
-    }, []);
-
-    const handleInstallClick = async () => {
-        if (!installPrompt) return;
-        installPrompt.prompt();
-        setInstallPrompt(null);
-    };
-
-    const handleLogin = (loggedInUser: User) => {
-        setUser(loggedInUser);
-        if (!firstLogin) {
-            setFirstLogin(new Date().toISOString());
-        }
-        setActiveScreen('guides');
-    };
-
-    const openPdf = (url: string, title: string) => {
-        setPdfViewerState({ visible: true, url, title });
-    };
-
-    const closePdf = () => {
-        setPdfViewerState({ visible: false, url: '', title: '' });
-    };
-
-    if (!user) {
-        return <LoginScreen onLogin={handleLogin} />;
+    if (purchasedPack) {
+      // 2. Se encontrou um ?pacote=... na URL, salva no LocalStorage
+      // para não perder
+      if (!unlockedPacks.includes(purchasedPack)) {
+        setUnlockedPacks(prevPacks => [...prevPacks, purchasedPack]);
+      }
+      
+      // 3. Limpa a URL para que a chave secreta desapareça
+      window.history.replaceState(null, '', window.location.pathname);
     }
+  }, []); // O array vazio [] garante que isto só corre uma vez
 
-    const renderScreen = () => {
-        switch (activeScreen) {
-            case 'guides':
-                return <GuidesScreen user={user} onOpenPdf={openPdf} />;
-            case 'diary':
-                return <DiaryScreen />;
-            case 'tasks':
-                return <TasksScreen />;
-            case 'community':
-                return <CommunityScreen />;
-            case 'rilane':
-                return <RilaneScreen />;
-            default:
-                return <GuidesScreen user={user} onOpenPdf={openPdf} />;
-        }
-    };
+  // --- Funções de Navegação e Login ---
 
-    return (
-        <div className="max-w-3xl mx-auto bg-white min-h-screen pb-[80px] relative">
-             {installPrompt && (
-                <button
-                    onClick={handleInstallClick}
-                    className="absolute top-5 right-5 bg-[#A185D7] text-white font-semibold py-2 px-4 rounded-full shadow-lg z-20 flex items-center gap-2 transition-transform transform hover:scale-105 hover:bg-[#8a6ec1]"
-                    aria-label="Instalar App"
-                >
-                    <DownloadIcon className="w-5 h-5" />
-                    <span>Instalar</span>
-                </button>
-            )}
-            <div id="app-container">
-                {renderScreen()}
-                <BottomNav activeScreen={activeScreen} onNavigate={setActiveScreen} />
-                <PdfViewer
-                    visible={pdfViewerState.visible}
-                    url={pdfViewerState.url}
-                    title={pdfViewerState.title}
-                    onClose={closePdf}
-                />
-            </div>
-        </div>
-    );
+  const handleLogin = (name: string, email: string) => {
+    setUser({ name, email });
+    if (!firstLogin) {
+      setFirstLogin(new Date().toISOString());
+    }
+    setCurrentScreen('guides');
+  };
+
+  const handleNavClick = (screen: Screen) => {
+    setCurrentScreen(screen);
+  };
+
+  const handleOpenGuide = (url: string, title: string) => {
+    setPdfViewerUrl(url);
+    setPdfViewerTitle(title);
+  };
+
+  const handleClosePdf = () => {
+    setPdfViewerUrl(null);
+  };
+
+  // --- Renderização ---
+
+  if (pdfViewerUrl) {
+    return <PdfViewer url={pdfViewerUrl} title={pdfViewerTitle} onClose={handleClosePdf} />;
+  }
+
+  if (!user) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
+
+  return (
+    <div className="pb-20"> {/* Padding para o menu inferior */}
+      
+      {currentScreen === 'guides' && (
+        <GuidesScreen 
+          user={user} 
+          firstLoginDate={firstLogin!} 
+          onOpenGuide={handleOpenGuide}
+          // Passamos os pacotes desbloqueados para a tela de Guias
+          unlockedPacks={unlockedPacks} 
+        />
+      )}
+      {currentScreen === 'diary' && <DiaryScreen />}
+      {currentScreen === 'tasks' && <TasksScreen />}
+      {currentScreen === 'community' && <CommunityScreen />}
+      {currentScreen === 'rilane' && <RilaneScreen />}
+      
+      <BottomNav currentScreen={currentScreen} onNavClick={handleNavClick} />
+    </div>
+  );
 };
 
 export default App;
