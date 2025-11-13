@@ -1,4 +1,5 @@
 // Copie e cole este conteúdo TODO no seu arquivo components/GuidesScreen.tsx
+// Este é o código que você me enviou antes, ele está perfeito.
 
 import React from 'react';
 import { guidesData, Guide } from '../constants';
@@ -53,8 +54,7 @@ const GuidesScreen: React.FC<GuidesScreenProps> = ({ user, firstLoginDate, unloc
     if (guide.type === 'bonus') {
       // AQUI ESTÁ A MÁGICA:
       // Verificamos se o array 'unlockedPacks' (do LocalStorage)
-      // inclui 'completo' (ou o nome do pacote que destrava este guia)
-      // ⚠️ Vamos assumir que ?pacote=completo destrava os dois.
+      // inclui 'completo' (que vem da URL ?plano=completo)
       const isUnlocked = unlockedPacks.includes('completo'); 
 
       if (isUnlocked) {
@@ -70,7 +70,7 @@ const GuidesScreen: React.FC<GuidesScreenProps> = ({ user, firstLoginDate, unloc
       }
       
       // O cliente não comprou. Mostra o botão de comprar.
-      // O 'buyUrl' é o link de checkout da Cakto para este item.
+      // O 'buyUrl' é o link de checkout da Caktus para este item.
       return (
         <a 
           href={guide.buyUrl}
