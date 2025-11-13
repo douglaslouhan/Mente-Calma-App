@@ -7,6 +7,13 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
+// --- CORREÇÃO ---
+// O bloco de código abaixo foi "comentado" (desativado).
+// Ele estava tentando carregar o arquivo '/service-worker.js',
+// que não foi encontrado (erro 404) e estava quebrando o app.
+// Ao desativar, o app vai carregar normalmente.
+
+/*
 // Registra o Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -19,6 +26,7 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+*/
 
 const root = ReactDOM.createRoot(rootElement);
 root.render(
