@@ -1,4 +1,5 @@
 // Copie e cole este conteúdo TODO no seu arquivo App.tsx
+// Eu corrigi a linha 33 para ?plano=completo
 
 import React, { useState, useEffect } from 'react';
 import LoginScreen from './components/LoginScreen';
@@ -9,8 +10,6 @@ import CommunityScreen from './components/CommunityScreen';
 import PdfViewer from './components/PdfViewer';
 import BottomNav from './components/BottomNav';
 import RilaneScreen from './components/RilaneScreen';
-
-// AQUI ESTÁ A CORREÇÃO (LINHA 12) - removi os { }
 import useLocalStorage from './hooks/useLocalStorage';
 
 // Define as chaves de LocalStorage
@@ -34,12 +33,14 @@ const App: React.FC = () => {
   // --- LÓGICA DE DESBLOQUEIO POR URL ---
   // Este código corre *uma vez* quando o app carrega
   useEffect(() => {
-    // 1. Pega os parâmetros da URL (ex: ?pacote=completo)
+    // 1. Pega os parâmetros da URL (ex: ?plano=completo)
     const params = new URLSearchParams(window.location.search);
-    const purchasedPack = params.get('pacote'); // 'pacote' é a chave que vamos usar
+    
+    // ⚠️ CORREÇÃO AQUI: Mudei de 'pacote' para 'plano'
+    const purchasedPack = params.get('plano'); // 'plano' é a chave que vamos usar
 
     if (purchasedPack) {
-      // 2. Se encontrou um ?pacote=... na URL, salva no LocalStorage
+      // 2. Se encontrou um ?plano=... na URL, salva no LocalStorage
       // para não perder
       if (!unlockedPacks.includes(purchasedPack)) {
         setUnlockedPacks(prevPacks => [...prevPacks, purchasedPack]);
