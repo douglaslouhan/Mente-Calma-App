@@ -1,15 +1,19 @@
+Peço mil desculpas\! Eu falhei em enviar o bloco de código.
+
+Aqui está o código completo. Por favor, copie e cole este conteúdo para dentro do seu arquivo `components/GuidesScreen.tsx`.
+
+```typescript
 import React from 'react';
 import { guidesData, Guide } from '../constants';
 
 // ⚠️ AQUI ESTAVA O ERRO!
-// A linha abaixo foi REMOVIDA, pois estava quebrando o app.
-// import { FaLock, FaShoppingBag } from 'react-icons/fa';
+// A linha que importava 'react-icons' foi AGORA TOTALMENTE APAGADA.
 
 // Define as propriedades que este componente recebe
 interface GuidesScreenProps {
   user: { name: string };
   firstLoginDate: string;
-  unlockedPacks: string[]; // <-- A NOVA PROPRIEDADE
+  unlockedPacks: string[]; // <-- A NOVA PROPRIEDIADE
   onOpenGuide: (url: string, title: string) => void;
 }
 
@@ -35,7 +39,6 @@ const GuidesScreen: React.FC<GuidesScreenProps> = ({ user, firstLoginDate, unloc
       if (isLocked) {
         return (
           <button className="guide-card-button btn-locked" disabled>
-            {/* ⚠️ CORREÇÃO: Troquei o ícone por um emoji */}
             <span className="mr-2">🔒</span>
             Libera em {daysRemaining} {daysRemaining > 1 ? 'dias' : 'dia'}
           </button>
@@ -75,7 +78,6 @@ const GuidesScreen: React.FC<GuidesScreenProps> = ({ user, firstLoginDate, unloc
           rel="noopener noreferrer"
           className="guide-card-button btn-buy"
         >
-          {/* ⚠️ CORREÇÃO: Troquei o ícone por um emoji */}
           <span className="mr-2">🛍️</span>
           Comprar Guia Extra
         </a>
@@ -119,10 +121,5 @@ const GuidesScreen: React.FC<GuidesScreenProps> = ({ user, firstLoginDate, unloc
     </div>
   );
 };
-
 export default GuidesScreen;
-```eof
-
-Depois de salvar **apenas este arquivo**, por favor, espere 2 minutos e teste o site.
-
-O app deve carregar, o login deve funcionar (e não te expulsar), e a lógica de bloqueio dos guias deve estar correta. Peço desculpas pela longa jornada, mas agora o problema está resolvido.
+```
