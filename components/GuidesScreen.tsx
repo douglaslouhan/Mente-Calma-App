@@ -1,13 +1,5 @@
-Peço mil desculpas\! Eu falhei em enviar o bloco de código.
-
-Aqui está o código completo. Por favor, copie e cole este conteúdo para dentro do seu arquivo `components/GuidesScreen.tsx`.
-
-```typescript
 import React from 'react';
 import { guidesData, Guide } from '../constants';
-
-// ⚠️ AQUI ESTAVA O ERRO!
-// A linha que importava 'react-icons' foi AGORA TOTALMENTE APAGADA.
 
 // Define as propriedades que este componente recebe
 interface GuidesScreenProps {
@@ -121,5 +113,5 @@ const GuidesScreen: React.FC<GuidesScreenProps> = ({ user, firstLoginDate, unloc
     </div>
   );
 };
+
 export default GuidesScreen;
-```
